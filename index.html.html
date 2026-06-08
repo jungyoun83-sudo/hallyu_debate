@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한류 논쟁 토론</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', sans-serif;
+  background: #EEF2F7;
+  color: #1a1a2e;
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+/* 헤더 */
+.app-header {
+  background: #1E3A6E;
+  color: white;
+  padding: 14px 20px;
+  text-align: center;
+}
+.app-header h1 { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+.app-header p { font-size: 12px; opacity: 0.75; margin-top: 3px; }
+
+/* 진행바 */
+.progress-bar {
+  display: flex;
+  background: #1E3A6E;
+  padding: 0 20px 14px;
+  gap: 4px;
+}
+.progress-step {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 2px;
+  transition: background 0.3s;
+}
+.progress-step.done { background: #4FC3F7; }
+.progress-step.active { background: #81D4FA; }
+
+/* 컨테이너 */
+.container { max-width: 680px; margin: 0 auto; padding: 20px 16px 0; }
+
+/* 카드 */
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  margin-bottom: 16px;
+}
+
+/* 단계 레이블 */
+.step-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1E3A6E;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.card h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; }
+.card p { font-size: 14px; color: #555; line-height: 1.65; margin-bottom: 12px; }
+
+/* 버튼 */
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.btn-primary { background: #1E3A6E; color: white; }
+.btn-primary:hover { background: #162d56; }
+.btn-primary:disabled { background: #9DB3CC; cursor: not-allowed; }
+.btn-block { display: block; width: 100%; text-align: center; margin-top: 8px; }
+.btn-outline {
+  background: white;
+  border: 2px solid #1E3A6E;
+  color: #1E3A6E;
+  padding: 10px 20px;
+  font-size: 14px;
+}
+.btn-outline:hover { background: #EEF2F7; }
+.btn-copy { background: #2E7D32; color: white; font-size: 15px; padding: 14px 24px; }
+.btn-copy:hover { background: #1B5E20; }
+.btn-small { padding: 8px 16px; font-size: 13px; border-radius: 8px; }
+
+/* 입장 선택 버튼 */
+.position-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+.pos-btn {
+  padding: 20px 12px;
+  border-radius: 14px;
+  border: 3px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  background: #F5F8FF;
+  font-family: inherit;
+}
+.pos-btn.edu { border-color: #e0e0e0; }
+.pos-btn.inv { border-color: #e0e0e0; }
+.pos-btn.selected.edu { border-color: #1E3A6E; background: #EEF2F7; }
+.pos-btn.selected.inv { border-color: #8B2020; background: #FFF0F0; }
+.pos-btn .emoji { font-size: 28px; display: block; margin-bottom: 8px; }
+.pos-btn .pos-title { font-size: 15px; font-weight: 700; }
+.pos-btn .pos-desc { font-size: 12px; color: #666; margin-top: 4px; line-height: 1.4; }
+
+/* 기준 카드 */
+.criteria-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 16px; }
+.criteria-card {
+  padding: 16px;
+  border-radius: 12px;
+  border: 2.5px solid #DDE3ED;
+  background: #F8FAFC;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.criteria-card:hover { border-color: #1E3A6E; }
+.criteria-card.selected { border-color: #1E3A6E; background: #EEF2F7; }
+.criteria-card .c-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.criteria-card .c-desc { font-size: 13px; color: #555; line-height: 1.5; }
+.criteria-card .c-check { float: right; font-size: 18px; }
+
+/* 근거 카드 */
+.evidence-grid { display: grid; gap: 10px; margin-top: 16px; }
+.ev-card {
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 2.5px solid #DDE3ED;
+  background: #F8FAFC;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+}
+.ev-card:hover { border-color: #1E3A6E; }
+.ev-card.selected.edu-ev { border-color: #1E3A6E; background: #EEF2F7; }
+.ev-card.selected.inv-ev { border-color: #8B2020; background: #FFF0F0; }
+.ev-card .ev-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+.ev-card .ev-tag.edu-tag { background: #E3F0FF; color: #1E3A6E; }
+.ev-card .ev-tag.inv-tag { background: #FFE3E3; color: #8B2020; }
+
+/* 글쓰기 */
+.keyword-section { margin-bottom: 14px; }
+.keyword-section .ks-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #555;
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+}
+.keyword-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.kchip {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: default;
+}
+.kchip-pos { background: #EEF2F7; color: #1E3A6E; border: 1.5px solid #1E3A6E; }
+.kchip-criteria { background: #FFF8E1; color: #92400E; border: 1.5px solid #F59E0B; }
+.kchip-ev { background: #F0FFF4; color: #166534; border: 1.5px solid #22C55E; font-weight: 400; font-size: 12px; }
+.writing-guide {
+  background: #F8FAFC;
+  border: 1.5px dashed #CBD5E1;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: #64748B;
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+.writing-guide span { display: block; margin-bottom: 4px; }
+.writing-guide span:last-child { margin-bottom: 0; }
+textarea {
+  width: 100%;
+  border: 2px solid #DDE3ED;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.7;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+  color: #1a1a2e;
+}
+textarea:focus { border-color: #1E3A6E; }
+
+/* AI 토론 */
+.ai-bubble {
+  background: #F0F4F8;
+  border-radius: 16px 16px 16px 4px;
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #1a1a2e;
+  margin-bottom: 16px;
+  border-left: 4px solid #1E3A6E;
+}
+.ai-bubble .ai-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1E3A6E;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+.student-bubble {
+  background: #FFF8E1;
+  border-radius: 16px 16px 4px 16px;
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #1a1a2e;
+  margin-bottom: 16px;
+  border-right: 4px solid #F59E0B;
+}
+.student-bubble .s-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #92400E;
+  margin-bottom: 8px;
+}
+.feedback-box {
+  background: #E8F5E9;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #1B5E20;
+  margin-bottom: 16px;
+  border-left: 4px solid #2E7D32;
+}
+.feedback-box .fb-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #2E7D32;
+  margin-bottom: 8px;
+}
+
+/* 최종 결과 */
+.final-box {
+  background: #F8FAFF;
+  border: 2px solid #1E3A6E;
+  border-radius: 14px;
+  padding: 20px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #1a1a2e;
+  margin-bottom: 16px;
+  white-space: pre-wrap;
+}
+
+/* 로딩 */
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+  font-size: 14px;
+}
+.loading::after {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 3px solid #ddd;
+  border-top-color: #1E3A6E;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+  margin-left: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* 알림 */
+.notice {
+  background: #FFF8E1;
+  border: 1px solid #F59E0B;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #92400E;
+  margin-bottom: 12px;
+}
+
+/* 히든 */
+.hidden { display: none !important; }
+
+/* 완성 태그 */
+.step-done-badge {
+  display: inline-block;
+  background: #E8F5E9;
+  color: #2E7D32;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 20px;
+  margin-left: 8px;
+}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>한류, 세계 문화 교류인가? 문화 침략인가?</h1>
+  <p>기준을 세우고 → 근거를 고르고 → AI와 토론하고 → 나만의 글 완성!</p>
+</div>
+<div class="progress-bar" id="progressBar">
+  <div class="progress-step active" id="pb1"></div>
+  <div class="progress-step" id="pb2"></div>
+  <div class="progress-step" id="pb3"></div>
+  <div class="progress-step" id="pb4"></div>
+  <div class="progress-step" id="pb5"></div>
+  <div class="progress-step" id="pb6"></div>
+</div>
+
+<div class="container">
+
+<!-- ===== STEP 1: 논제 제시 ===== -->
+<div id="step1">
+  <div class="card">
+    <div class="step-label">📌 논제 제시</div>
+    <h2>한류는 세계 문화 교류인가, 문화 침략인가?</h2>
+    <p>우리는 칭기즈칸과 콜럼버스를 통해 배웠어요.<br>
+    <strong>관점과 기준에 따라 같은 사건도 전혀 다르게 평가된다!</strong></p>
+    <p>이제 그 이해를 우리 시대 이야기에 직접 써볼게요. K-pop, K-drama, K-food로 대표되는 <strong>한류</strong>를 두고 세계 곳곳에서 서로 다른 목소리가 들려오고 있어요.</p>
+    <p style="background:#EEF2F7;border-radius:10px;padding:12px;font-size:13px;color:#1E3A6E;">
+      💡 <strong>이 앱의 사용법</strong><br>
+      ① 내 입장 정하기 → ② 기준 선택 → ③ 근거 고르기 → ④ 초안 쓰기<br>
+      → ⑤ <strong>AI와 토론하며 생각 다듬기</strong> → ⑥ 최종 글 완성 & 복사
+    </p>
+    <button class="btn btn-primary btn-block" onclick="goStep(2)">시작하기 →</button>
+  </div>
+</div>
+
+<!-- ===== STEP 2: 입장 선택 ===== -->
+<div id="step2" class="hidden">
+  <div class="card">
+    <div class="step-label">STEP 1 · 내 입장 선택</div>
+    <h2>먼저, 나의 입장을 정해보자</h2>
+    <p>지금 단계에서는 직관적으로 선택해도 괜찮아요. 나중에 근거를 보면서 바뀔 수도 있어요!</p>
+    <div class="position-grid">
+      <button class="pos-btn edu" onclick="selectPosition('교류')">
+        <span class="emoji">🌐</span>
+        <div class="pos-title">문화 교류</div>
+        <div class="pos-desc">한류는 세계와 한국이 연결되는 자발적 문화 교류다</div>
+      </button>
+      <button class="pos-btn inv" onclick="selectPosition('침략')">
+        <span class="emoji">⚠️</span>
+        <div class="pos-title">문화 침략</div>
+        <div class="pos-desc">한류는 현지 문화를 잠식하는 문화 침략이다</div>
+      </button>
+    </div>
+    <button class="btn btn-primary btn-block" id="btn2" disabled onclick="goStep(3)">기준 선택하러 가기 →</button>
+  </div>
+</div>
+
+<!-- ===== STEP 3: 기준 선택 ===== -->
+<div id="step3" class="hidden">
+  <div class="card">
+    <div class="step-label">STEP 2 · 기준 선택</div>
+    <h2>어떤 기준으로 판단할 건가요?</h2>
+    <p>같은 한류라도 <strong>어떤 기준</strong>으로 보느냐에 따라 평가가 달라져요. 1~2개 선택해보세요.</p>
+    <div class="criteria-grid">
+      <div class="criteria-card" onclick="toggleCriteria('상호성', this)">
+        <span class="c-check" id="ck-상호성">○</span>
+        <div class="c-title">🔄 상호성</div>
+        <div class="c-desc">교류는 양방향이어야 한다. 한류가 일방향인지, 쌍방향인지를 기준으로 판단한다.</div>
+      </div>
+      <div class="criteria-card" onclick="toggleCriteria('자발성', this)">
+        <span class="c-check" id="ck-자발성">○</span>
+        <div class="c-title">🙋 자발성</div>
+        <div class="c-desc">진짜 교류는 스스로 원해서 이루어진다. 수용국 사람들이 자유롭게 선택했는지를 기준으로 판단한다.</div>
+      </div>
+      <div class="criteria-card" onclick="toggleCriteria('결과', this)">
+        <span class="c-check" id="ck-결과">○</span>
+        <div class="c-title">📊 결과</div>
+        <div class="c-desc">어떤 결과를 가져왔는지를 기준으로 판단한다. 누구에게 이익이었고 누구에게 피해였는가?</div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" id="btn3" disabled onclick="goStep(4)">근거 고르러 가기 →</button>
+  </div>
+</div>
+
+<!-- ===== STEP 4: 근거 선택 ===== -->
+<div id="step4" class="hidden">
+  <div class="card">
+    <div class="step-label">STEP 3 · 근거 선택</div>
+    <h2>내 입장을 뒷받침하는 근거를 골라보자</h2>
+    <p>내 입장과 기준에 맞는 근거 카드들이에요. <strong>가장 설득력 있다고 생각하는 것 1~2개</strong>를 선택하세요.</p>
+    <div class="evidence-grid" id="evidenceGrid"></div>
+    <button class="btn btn-primary btn-block" id="btn4" disabled onclick="goStep(5)">초안 쓰러 가기 →</button>
+  </div>
+</div>
+
+<!-- ===== STEP 5: 초안 작성 ===== -->
+<div id="step5" class="hidden">
+  <div class="card">
+    <div class="step-label">STEP 4 · 내 글 쓰기</div>
+    <h2>이 키워드들을 활용해서 내 주장을 써보자!</h2>
+    <p>아래 키워드는 내가 직접 고른 것들이에요. 이걸 활용해서 <strong>나만의 문장</strong>으로 주장을 완성해보세요.</p>
+
+    <div class="keyword-section">
+      <div class="ks-label">📌 내 입장</div>
+      <div class="keyword-chips" id="chips-pos"></div>
+    </div>
+    <div class="keyword-section">
+      <div class="ks-label">🔑 내가 선택한 기준</div>
+      <div class="keyword-chips" id="chips-criteria"></div>
+    </div>
+    <div class="keyword-section">
+      <div class="ks-label">📋 내가 선택한 근거 핵심어</div>
+      <div class="keyword-chips" id="chips-evidence"></div>
+    </div>
+
+    <div class="writing-guide">
+      <span>✏️ <strong>이렇게 써보면 어때요?</strong></span>
+      <span>① 나의 입장을 한 문장으로 밝히기</span>
+      <span>② 내가 선택한 기준을 넣어 이유 설명하기</span>
+      <span>③ 근거 핵심어를 활용해 구체적 사례 들기</span>
+      <span>④ 마무리 문장으로 주장 강조하기</span>
+    </div>
+
+    <textarea id="draftText" rows="7" placeholder="여기에 직접 써보세요. 키워드를 활용해 나만의 문장으로 만들어 보는 게 포인트!" oninput="checkDraft()"></textarea>
+    <button class="btn btn-primary btn-block" id="btn5" disabled onclick="goStep(6)">AI 토론 시작하기 →</button>
+  </div>
+</div>
+
+<!-- ===== STEP 6: AI 토론 ===== -->
+<div id="step6" class="hidden">
+  <div class="card">
+    <div class="step-label">STEP 5 · AI 토론</div>
+    <h2>AI가 반론을 제시해요. 어떻게 반박할까요?</h2>
+    <p>내 주장에 대해 반대 입장의 AI가 질문을 던져요. 잘 읽고 내 생각을 발전시켜 보세요!</p>
+
+    <div id="myDraftReview" class="student-bubble" style="margin-bottom:16px;">
+      <div class="s-label">✏️ 나의 초안</div>
+      <span id="draftPreview"></span>
+    </div>
+
+    <div id="aiLoadingBox" class="loading">AI가 반론을 생각하는 중</div>
+
+    <div id="aiDebateArea" class="hidden">
+      <div class="ai-bubble">
+        <div class="ai-label">🤖 AI의 반론</div>
+        <span id="aiCounterText"></span>
+      </div>
+
+      <p style="font-size:14px;font-weight:700;margin-bottom:8px;color:#1a1a2e;">👉 AI의 반론에 어떻게 답하겠어요?</p>
+      <textarea id="responseText" rows="4" placeholder="내 생각을 써보세요. AI 반론의 약점을 짚거나, 내 주장을 더 보완해도 좋아요!" oninput="checkResponse()"></textarea>
+      <button class="btn btn-primary btn-block" id="btn6resp" disabled onclick="getFeedback()">답변 제출 & AI 피드백 받기 →</button>
+    </div>
+
+    <div id="feedbackLoadingBox" class="loading hidden">AI가 피드백을 작성하는 중</div>
+
+    <div id="feedbackArea" class="hidden">
+      <div class="student-bubble">
+        <div class="s-label">✏️ 나의 답변</div>
+        <span id="responsePreview"></span>
+      </div>
+      <div class="feedback-box">
+        <div class="fb-label">💬 AI 피드백</div>
+        <span id="feedbackText"></span>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="goStep(7)">최종 글 완성하러 가기 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STEP 7: 최종 완성 ===== -->
+<div id="step7" class="hidden">
+  <div class="card">
+    <div class="step-label">STEP 6 · 최종 완성</div>
+    <h2>최종 글을 다듬고 패들렛에 올려보자!</h2>
+    <p>AI가 제안한 글이에요. 수정해도 되고 그대로 써도 돼요!</p>
+    <div id="finalLoadingBox" class="loading">AI가 최종 글을 정리하는 중</div>
+    <div id="finalArea" class="hidden">
+      <textarea id="finalText" rows="10" style="font-size:14px;line-height:1.8;"></textarea>
+      <button class="btn btn-copy btn-block" onclick="copyText()" id="copyBtn">📋 글 복사하기 (패들렛에 붙여넣기)</button>
+      <div id="copySuccess" class="hidden" style="text-align:center;color:#2E7D32;font-size:14px;font-weight:700;padding:10px;">✅ 복사 완료! 패들렛에서 붙여넣기 하세요.</div>
+      <button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="restart()">↩ 처음부터 다시하기</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// =====================================================
+// ★ 여기에 Google AI Studio API 키를 붙여넣으세요 ★
+// aistudio.google.com → Get API Key → 복사
+// =====================================================
+const GEMINI_API_KEY = 'AQ.Ab8RN6KPt7qj1jEllwFdKWxOySH18cHXANNPF3PzvnZSqByDDw';
+// =====================================================
+
+async function askAI(prompt) {
+  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'AQ.Ab8RN6KPt7qj1jEllwFdKWxOySH18cHXANNPF3PzvnZSqByDDw') {
+    throw new Error('API 키를 설정해주세요.');
+  }
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+  });
+  const data = await res.json();
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '응답을 가져올 수 없습니다.';
+}
+
+const state = {
+  step: 1,
+  position: null,
+  criteria: [],
+  evidence: [],
+  draft: '',
+  aiCounter: '',
+  studentResponse: '',
+  aiFeedback: ''
+};
+
+const evidenceData = {
+  상호성: {
+    교류: [
+      { id: 's1', text: '한국도 팝, 힙합, 영화 등 외국 문화를 적극 수용해왔다. 한류는 일방적이 아닌 상호적 문화 접촉의 결과이다.' },
+      { id: 's2', text: '세종학당 수강생이 2012년 1만 명에서 2023년 24만 명으로 늘었다. 세계가 한국 문화에 관심을 갖는 양방향 교류가 이루어지고 있다.' },
+    ],
+    침략: [
+      { id: 's3', text: '한국→세계 방향의 콘텐츠 흐름이 압도적이며, 수용국의 문화는 한국에 거의 소비되지 않는 비대칭적 구조이다.' },
+      { id: 's4', text: '태국 전통 음악인 협회장은 "우리 전통 음악이 K-pop에 밀려 설 자리를 잃고 있다"고 호소했다.' },
+    ]
+  },
+  자발성: {
+    교류: [
+      { id: 'j1', text: '인도네시아 팬 Siti는 "강요가 아니라 우리가 스스로 좋아서 선택한 것"이라고 말했다. 어떤 정부도 K-pop을 강요하지 않았다.' },
+      { id: 'j2', text: '전 세계 팬들이 자발적으로 팬클럽을 만들고, 한국어를 배우며 문화를 수용하고 있다.' },
+    ],
+    침략: [
+      { id: 'j3', text: '프랑스 평론가 Marie Dupont은 "팬들이 스스로 선택한다고 느끼게 만드는 것 자체가 대형 기획사의 마케팅 전략"이라고 비판했다.' },
+      { id: 'j4', text: '유튜브·틱톡 알고리즘이 K-pop을 반복 추천하면서, 팬들의 "자발적 선택"이 실제로는 자본의 논리에 따라 유도된 것일 수 있다.' },
+    ]
+  },
+  결과: {
+    교류: [
+      { id: 'g1', text: '2023년 한류 관련 수출 유발 효과는 약 14조 원이며, 한국어·한국 음식·한국 여행에 대한 세계적 관심이 폭발적으로 증가했다.' },
+      { id: 'g2', text: '한류 덕분에 한국의 역사와 문화에 관심을 갖는 외국인이 늘어, 문화 간 이해와 교류가 깊어지고 있다.' },
+    ],
+    침략: [
+      { id: 'g3', text: 'K-pop 아이돌의 외모 기준이 전 세계로 확산되어 획일화된 미의 기준을 강요한다는 지적이 있다.' },
+      { id: 'g4', text: '인도네시아, 태국 등 일부 국가의 예술인 단체가 정부에 한류 콘텐츠 규제를 요청하는 등 현지 문화 산업이 위협받고 있다.' },
+    ]
+  }
+};
+
+function updateProgress(step) {
+  for (let i = 1; i <= 6; i++) {
+    const el = document.getElementById('pb' + i);
+    if (i < step) { el.className = 'progress-step done'; }
+    else if (i === step) { el.className = 'progress-step active'; }
+    else { el.className = 'progress-step'; }
+  }
+}
+
+function goStep(n) {
+  document.getElementById('step' + state.step).classList.add('hidden');
+  state.step = n;
+  document.getElementById('step' + n).classList.remove('hidden');
+  updateProgress(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (n === 4) buildEvidence();
+  if (n === 5) buildTemplate();
+  if (n === 6) { document.getElementById('draftPreview').textContent = state.draft; startDebate(); }
+  if (n === 7) buildFinal();
+}
+
+function selectPosition(pos) {
+  state.position = pos;
+  document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('selected'));
+  const sel = pos === '교류' ? document.querySelectorAll('.pos-btn.edu')[0] : document.querySelectorAll('.pos-btn.inv')[0];
+  sel.classList.add('selected');
+  document.getElementById('btn2').disabled = false;
+}
+
+function toggleCriteria(name, el) {
+  const idx = state.criteria.indexOf(name);
+  if (idx >= 0) {
+    state.criteria.splice(idx, 1);
+    el.classList.remove('selected');
+    document.getElementById('ck-' + name).textContent = '○';
+  } else {
+    if (state.criteria.length >= 2) return;
+    state.criteria.push(name);
+    el.classList.add('selected');
+    document.getElementById('ck-' + name).textContent = '✓';
+  }
+  document.getElementById('btn3').disabled = state.criteria.length === 0;
+}
+
+function buildEvidence() {
+  const grid = document.getElementById('evidenceGrid');
+  grid.innerHTML = '';
+  state.evidence = [];
+  state.criteria.forEach(c => {
+    const items = evidenceData[c][state.position];
+    const tagClass = state.position === '교류' ? 'edu-tag' : 'inv-tag';
+    items.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'ev-card ' + (state.position === '교류' ? 'edu-ev' : 'inv-ev');
+      div.setAttribute('data-id', item.id);
+      div.innerHTML = `<div class="ev-tag ${tagClass}">${c} 기준 · ${state.position === '교류' ? '교류 측 근거' : '침략 측 근거'}</div><div>${item.text}</div>`;
+      div.onclick = () => toggleEvidence(item.id, item.text, div);
+      grid.appendChild(div);
+    });
+  });
+}
+
+function toggleEvidence(id, text, el) {
+  const posClass = state.position === '교류' ? 'edu-ev' : 'inv-ev';
+  const idx = state.evidence.findIndex(e => e.id === id);
+  if (idx >= 0) {
+    state.evidence.splice(idx, 1);
+    el.classList.remove('selected');
+  } else {
+    if (state.evidence.length >= 2) return;
+    state.evidence.push({ id, text });
+    el.classList.add('selected');
+  }
+  document.getElementById('btn4').disabled = state.evidence.length === 0;
+}
+
+function buildTemplate() {
+  // 입장 칩
+  document.getElementById('chips-pos').innerHTML =
+    `<span class="kchip kchip-pos">문화 ${state.position}</span>`;
+
+  // 기준 칩
+  document.getElementById('chips-criteria').innerHTML =
+    state.criteria.map(c => `<span class="kchip kchip-criteria">${c}</span>`).join('');
+
+  // 근거 핵심어 칩: 각 근거에서 핵심 단어만 추출
+  const evKeywords = state.evidence.map(e => {
+    // 근거 문장에서 핵심 단어구 추출 (첫 번째 '.' 이전 혹은 첫 20자 + ...)
+    const short = e.text.length > 28 ? e.text.substring(0, 28) + '…' : e.text;
+    return `<span class="kchip kchip-ev">${short}</span>`;
+  }).join('');
+  document.getElementById('chips-evidence').innerHTML = evKeywords;
+
+  // textarea는 비워두기 (학생이 직접 작성)
+  document.getElementById('draftText').value = '';
+  state.draft = '';
+  document.getElementById('btn5').disabled = true;
+}
+
+function checkDraft() {
+  state.draft = document.getElementById('draftText').value;
+  document.getElementById('btn5').disabled = state.draft.trim().length < 10;
+}
+
+async function startDebate() {
+  document.getElementById('aiLoadingBox').classList.remove('hidden');
+  document.getElementById('aiDebateArea').classList.add('hidden');
+
+  const oppositePos = state.position === '교류' ? '문화 침략' : '문화 교류';
+  const prompt = `당신은 중학교 역사 수업의 AI 토론 상대입니다. 학생이 다음과 같은 주장을 했습니다.
+
+학생 주장: "${state.draft}"
+학생이 선택한 기준: ${state.criteria.join(', ')}
+학생의 입장: 한류는 문화 ${state.position}이다
+
+반대 입장(${oppositePos})에서 학생의 주장에 반론을 제시해주세요.
+- 중학교 2학년이 이해할 수 있는 쉬운 말로
+- 2~3문장으로 간결하게
+- "그런데 이런 건 어떻게 생각해?" 또는 "만약 네 말대로라면..." 형식으로 시작
+- 학생이 더 깊이 생각하게 만드는 질문 포함
+- 반드시 한국어로`;
+
+  try {
+    const result = await askAI(prompt);
+    document.getElementById('aiCounterText').textContent = result;
+    state.aiCounter = result;
+    document.getElementById('aiLoadingBox').classList.add('hidden');
+    document.getElementById('aiDebateArea').classList.remove('hidden');
+  } catch(e) {
+    document.getElementById('aiLoadingBox').textContent = 'AI 연결에 문제가 있어요. API 키를 확인해주세요.';
+  }
+}
+
+function checkResponse() {
+  state.studentResponse = document.getElementById('responseText').value;
+  document.getElementById('btn6resp').disabled = state.studentResponse.trim().length < 10;
+}
+
+async function getFeedback() {
+  state.studentResponse = document.getElementById('responseText').value;
+  document.getElementById('responsePreview').textContent = state.studentResponse;
+  document.getElementById('feedbackLoadingBox').classList.remove('hidden');
+
+  const prompt = `당신은 중학교 역사 수업의 AI 피드백 코치입니다.
+
+학생의 원래 주장: "${state.draft}"
+AI의 반론: "${state.aiCounter}"
+학생의 반박/답변: "${state.studentResponse}"
+
+학생의 답변에 대해:
+1. 잘 된 점 1가지를 짧게 칭찬
+2. 주장을 더 강하게 만들 수 있는 조언 1~2가지
+3. 격려로 마무리
+중학교 2학년 수준으로, 전체 4~5문장으로, 한국어로 써주세요.`;
+
+  try {
+    const result = await askAI(prompt);
+    document.getElementById('feedbackText').textContent = result;
+    state.aiFeedback = result;
+    document.getElementById('feedbackLoadingBox').classList.add('hidden');
+    document.getElementById('feedbackArea').classList.remove('hidden');
+  } catch(e) {
+    document.getElementById('feedbackLoadingBox').textContent = 'AI 연결에 문제가 있어요. API 키를 확인해주세요.';
+  }
+}
+
+async function buildFinal() {
+  document.getElementById('finalLoadingBox').classList.remove('hidden');
+  document.getElementById('finalArea').classList.add('hidden');
+
+  const prompt = `당신은 중학교 역사 수업의 글쓰기 코치입니다. 아래 내용을 바탕으로 학생의 최종 주장글을 완성해주세요.
+
+학생의 입장: 한류는 문화 ${state.position}이다
+선택한 기준: ${state.criteria.join(', ')}
+초안: "${state.draft}"
+토론 후 보완한 생각: "${state.studentResponse}"
+AI 피드백: "${state.aiFeedback}"
+
+아래 조건으로 최종 글을 완성해주세요:
+- 중학교 2학년 수준의 쉬운 문장
+- 4~6문장 분량
+- 구조: 입장 밝히기 → 기준 제시 → 근거 → 토론으로 보완된 생각 → 마무리
+- 한국어로만 작성
+- 완성된 글만 출력 (설명 없이)`;
+
+  try {
+    const result = await askAI(prompt);
+    document.getElementById('finalText').value = result;
+    document.getElementById('finalLoadingBox').classList.add('hidden');
+    document.getElementById('finalArea').classList.remove('hidden');
+  } catch(e) {
+    document.getElementById('finalText').value = state.draft + '\n\n(AI 연결 오류로 초안을 사용합니다. 직접 다듬어 주세요.)';
+    document.getElementById('finalLoadingBox').classList.add('hidden');
+    document.getElementById('finalArea').classList.remove('hidden');
+  }
+}
+
+function copyText() {
+  const text = document.getElementById('finalText').value;
+  navigator.clipboard.writeText(text).then(() => {
+    document.getElementById('copySuccess').classList.remove('hidden');
+    setTimeout(() => document.getElementById('copySuccess').classList.add('hidden'), 3000);
+  }).catch(() => {
+    document.getElementById('finalText').select();
+    document.execCommand('copy');
+    document.getElementById('copySuccess').classList.remove('hidden');
+    setTimeout(() => document.getElementById('copySuccess').classList.add('hidden'), 3000);
+  });
+}
+
+function restart() {
+  state.step = 1;
+  state.position = null;
+  state.criteria = [];
+  state.evidence = [];
+  state.draft = '';
+  state.aiCounter = '';
+  state.studentResponse = '';
+  state.aiFeedback = '';
+  for (let i = 2; i <= 7; i++) document.getElementById('step' + i).classList.add('hidden');
+  document.getElementById('step1').classList.remove('hidden');
+  document.getElementById('aiDebateArea').classList.add('hidden');
+  document.getElementById('feedbackArea').classList.add('hidden');
+  document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.criteria-card').forEach(c => c.classList.remove('selected'));
+  ['상호성','자발성','결과'].forEach(k => { document.getElementById('ck-'+k).textContent = '○'; });
+  document.getElementById('btn2').disabled = true;
+  document.getElementById('btn3').disabled = true;
+  updateProgress(1);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+updateProgress(1);
+</script>
+</body>
+</html>
